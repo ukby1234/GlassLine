@@ -10,9 +10,9 @@ import engine.factory.testing.util.*;
 public class ConveyorAgent extends Agent implements Conveyor {
 	public EventLog events = new EventLog();
 	public List<Part> parts = Collections.synchronizedList(new ArrayList<Part>()); 
-	enum ConveyorState {Running, Stopped};
-	ConveyorState conveyorState = ConveyorState.Running;
-	boolean changed = false;
+	public static enum ConveyorState {Running, Stopped};
+	public ConveyorState conveyorState = ConveyorState.Running;
+	public boolean changed = false;
 	PostSensor exitSensor;
 	//Messaging
 	@Override

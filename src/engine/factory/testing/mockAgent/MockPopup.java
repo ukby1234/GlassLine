@@ -1,8 +1,6 @@
 package engine.factory.testing.mockAgent;
 
-import engine.factory.interfaces.ConveyorFamily;
-import engine.factory.interfaces.Popup;
-import engine.factory.interfaces.PostSensor;
+import engine.factory.interfaces.*;
 import engine.factory.shared.Part;
 import engine.factory.testing.util.*;
 
@@ -33,12 +31,6 @@ public class MockPopup implements Popup {
 	}
 
 	@Override
-	public void msgPartsDone() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void msgMoveFinished() {
 		// TODO Auto-generated method stub
 
@@ -60,6 +52,24 @@ public class MockPopup implements Popup {
 	public String getName() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void msgSendGlassToPopup(Part p) {
+		// TODO Auto-generated method stub
+		events.add(new LoggedEvent("Receive part " + p.type));
+	}
+
+	@Override
+	public void msgMovePopup(Workstation ws) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void addWorkStation(Workstation ws) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

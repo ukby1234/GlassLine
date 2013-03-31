@@ -10,10 +10,11 @@ import java.util.*;
 public class ConveyorEntrySensorAgent extends Agent implements PreSensor{
 	public EventLog events = new EventLog();
 	public List<Part> parts = Collections.synchronizedList(new ArrayList<Part>());
-	public enum SensorState {Pressed, Released, Nothing};
+	public static enum SensorState {Pressed, Released, Nothing};
 	public SensorState sensorState = SensorState.Nothing;
 	public Conveyor conveyor;
 	public ConveyorFamily prevConv;
+	public int index;
 	//Messaging
 	
 	public void msgHereIsParts(Part p) {
@@ -44,10 +45,10 @@ public class ConveyorEntrySensorAgent extends Agent implements PreSensor{
 		// TODO Auto-generated method stub
 		if(sensorState == SensorState.Pressed) {
 			informPrevConveyor();
-			try {
+			/*try {
 				Thread.sleep(500);
 			}catch(InterruptedException e) {}
-			msgReleased();
+			msgReleased();*/
 			return true;
 		}
 		
@@ -94,7 +95,17 @@ public class ConveyorEntrySensorAgent extends Agent implements PreSensor{
 	@Override
 	public void eventFired(TChannel channel, TEvent event, Object[] args) {
 		// TODO Auto-generated method stub
-
+		int index = -1;
+		if (args[0] instanceof Integer) {
+			index = (Integer)args[0];
+		}
+		if (index == this.index) {
+			if (channel == TChannel.SENSOR && event == TEvent.SENSOR_GUI_PRESSED)
+				msgPressed();
+			else if (channel == TChannel.SENSOR && event == TEvent.SENSOR_GUI_RELEASED)
+				msgReleased();
+				
+		}
 	}
 	
 	public void setConveyor(Conveyor c) {

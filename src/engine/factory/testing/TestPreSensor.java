@@ -27,11 +27,15 @@ public class TestPreSensor {
 		MockConveyorFamily prevConv = new MockConveyorFamily();
 		entry.setPrevConv(prevConv);
 		Part p = new Part("x");
+		assertTrue(entry.sensorState == SensorState.Nothing);
+		assertTrue(entry.parts.isEmpty());
 		entry.msgHereIsParts(p);
 		entry.msgPressed();
+		assertFalse(entry.parts.isEmpty());
+		assertTrue(entry.sensorState == SensorState.Pressed);
 		assertTrue(entry.pickAndExecuteAnAction());
-		entry.events.containsString("Sensor Pressed");
-		entry.events.containsString("Stop Conveyor");
+		assertTrue(entry.events.containsString("Sensor Pressed"));
+		assertTrue(entry.events.containsString("Stop Conveyor"));
 	}
 	
 	@Test
@@ -42,15 +46,22 @@ public class TestPreSensor {
 		entry.setConveyor(conv);
 		entry.setPrevConv(prevConv);
 		Part p = new Part("x");
+		assertTrue(entry.sensorState == SensorState.Nothing);
+		assertTrue(entry.parts.isEmpty());
 		entry.msgHereIsParts(p);
 		entry.msgPressed();
+		assertFalse(entry.parts.isEmpty());
+		assertTrue(entry.sensorState == SensorState.Pressed);
 		assertTrue(entry.pickAndExecuteAnAction());
-		entry.events.containsString("Sensor Pressed");
-		entry.events.containsString("Stop Conveyor");
+		assertFalse(entry.parts.isEmpty());
+		assertTrue(entry.sensorState == SensorState.Pressed);
+		assertTrue(entry.events.containsString("Sensor Pressed"));
+		assertTrue(entry.events.containsString("Stop Conveyor"));
+		entry.msgReleased();
 		assertTrue(entry.pickAndExecuteAnAction());
-		entry.events.containsString("Sensor Released");
-		entry.events.containsString("Start Conveyor");
-		conv.events.containsString("Parts Receiving x");
+		assertTrue(entry.events.containsString("Sensor Released"));
+		assertTrue(entry.events.containsString("Start Conveyor"));
+		assertTrue(conv.events.containsString("Parts Receiving x"));
 	}
 	
 	@Test
@@ -60,11 +71,17 @@ public class TestPreSensor {
 		MockConveyorFamily prevConv = new MockConveyorFamily();
 		entry.setConveyor(conv);
 		entry.setPrevConv(prevConv);
+		assertTrue(entry.sensorState == SensorState.Nothing);
+		assertTrue(entry.parts.isEmpty());
 		Part p = new Part("x");
 		entry.msgHereIsParts(p);
 		entry.msgPressed();
+		assertFalse(entry.parts.isEmpty());
+		assertTrue(entry.sensorState == SensorState.Pressed);
 		assertTrue(entry.pickAndExecuteAnAction());
 		assertTrue(prevConv.events.containsString("Conveyor Stopping"));
+		entry.msgReleased();
+		assertTrue(entry.sensorState == SensorState.Released);
 		assertTrue(entry.pickAndExecuteAnAction());
 		assertTrue(prevConv.events.containsString("Conveyor Working"));
 	}

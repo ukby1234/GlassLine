@@ -12,21 +12,22 @@ public class ConveyorExitSensorAgent extends Agent implements PostSensor{
 	public EventLog events = new EventLog();
 	public List<Part> parts = Collections.synchronizedList(new ArrayList<Part>());
 	public Part currentPart = null;
-	enum SensorState {Pressed, Released, Nothing};
-	enum PopupState {Up, Down};
-	enum ConveyorState {Running, Stopped};
-	SensorState sensorState = SensorState.Nothing;
-	PopupState popupState = PopupState.Down;
-	ConveyorState conveyorState = ConveyorState.Running;
+	public enum SensorState {Pressed, Released, Nothing};
+	public enum PopupState {Up, Down};
+	public enum ConveyorState {Running, Stopped};
+	public SensorState sensorState = SensorState.Nothing;
+	public PopupState popupState = PopupState.Down;
+	public ConveyorState conveyorState = ConveyorState.Running;
 	Conveyor conveyor;
 	Popup popup;
-	Semaphore sem = new Semaphore(0, true);
+	public int index;
+	//Semaphore sem = new Semaphore(0, true);
 	public void msgHereIsParts(Part p) {
 		// TODO Auto-generated method stub
 		print("Receive Part " + p.type);
 		events.add(new LoggedEvent("Receive Part " + p.type));
 		parts.add(p);
-		msgPressed();
+		//msgPressed();
 		stateChanged();
 	}
 
@@ -40,7 +41,7 @@ public class ConveyorExitSensorAgent extends Agent implements PostSensor{
 	public void msgReleased() {
 		// TODO Auto-generated method stub
 		sensorState = SensorState.Released;
-		sem.release();
+		//sem.release();
 		print("Parts released");
 		events.add(new LoggedEvent("Released"));
 		stateChanged();	
@@ -71,7 +72,7 @@ public class ConveyorExitSensorAgent extends Agent implements PostSensor{
 			return true;
 		}
 		
-		if (sensorState == SensorState.Pressed && popupState == PopupState.Down && conveyorState == ConveyorState.Running) {
+		/*if (sensorState == SensorState.Pressed && popupState == PopupState.Down && conveyorState == ConveyorState.Running) {
 			print("2");
 			print("" + parts.isEmpty());
 			try {
@@ -79,7 +80,7 @@ public class ConveyorExitSensorAgent extends Agent implements PostSensor{
 			}catch(InterruptedException e) {}
 			msgReleased();		
 			return true;
-		}
+		}*/
 		
 		if (popupState == PopupState.Down && conveyorState == ConveyorState.Stopped) {
 			print("3");
@@ -118,7 +119,17 @@ public class ConveyorExitSensorAgent extends Agent implements PostSensor{
 	@Override
 	public void eventFired(TChannel channel, TEvent event, Object[] args) {
 		// TODO Auto-generated method stub
-
+		int index = -1;
+		if (args[0] instanceof Integer) {
+			index = (Integer)args[0];
+		}
+		if (index == this.index) {
+			if (channel == TChannel.SENSOR && event == TEvent.SENSOR_GUI_PRESSED)
+				msgPressed();
+			else if (channel == TChannel.SENSOR && event == TEvent.SENSOR_GUI_RELEASED)
+				msgReleased();
+				
+		}
 	}
 
 	public ConveyorExitSensorAgent(String agentName) {
