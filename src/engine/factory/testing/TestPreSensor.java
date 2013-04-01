@@ -3,6 +3,10 @@ package engine.factory.testing;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
+import transducer.TChannel;
+import transducer.TEvent;
+import transducer.Transducer;
+
 import engine.factory.conveyorFamily.ConveyorEntrySensorAgent;
 import engine.factory.conveyorFamily.ConveyorEntrySensorAgent.SensorState;
 import engine.factory.shared.Part;
@@ -13,7 +17,10 @@ public class TestPreSensor {
 	@Test
 	public void testHereIsPart() {
 		//fail("Not yet implemented");
-		ConveyorEntrySensorAgent entry = new ConveyorEntrySensorAgent("Entry");
+		Transducer trans = new Transducer();
+		Object args[] = new Object[1];
+		args[0] = 0;
+		ConveyorEntrySensorAgent entry = new ConveyorEntrySensorAgent("Entry", trans, 0);
 		assertTrue(entry.sensorState == SensorState.Nothing);
 		assertTrue(entry.parts.isEmpty());
 		Part p = new Part("x");
@@ -23,24 +30,32 @@ public class TestPreSensor {
 	
 	@Test
 	public void testPressing() {
-		ConveyorEntrySensorAgent entry = new ConveyorEntrySensorAgent("Entry");
+		Transducer trans = new Transducer();
+		Object args[] = new Object[1];
+		args[0] = 0;
+		ConveyorEntrySensorAgent entry = new ConveyorEntrySensorAgent("Entry", trans, 0);
 		MockConveyorFamily prevConv = new MockConveyorFamily();
 		entry.setPrevConv(prevConv);
 		Part p = new Part("x");
 		assertTrue(entry.sensorState == SensorState.Nothing);
 		assertTrue(entry.parts.isEmpty());
+		assertFalse(entry.flag);
 		entry.msgHereIsParts(p);
-		entry.msgPressed();
+		entry.eventFired(TChannel.SENSOR, TEvent.SENSOR_GUI_PRESSED, args);
 		assertFalse(entry.parts.isEmpty());
 		assertTrue(entry.sensorState == SensorState.Pressed);
 		assertTrue(entry.pickAndExecuteAnAction());
 		assertTrue(entry.events.containsString("Sensor Pressed"));
 		assertTrue(entry.events.containsString("Stop Conveyor"));
+		assertTrue(entry.flag);
 	}
 	
 	@Test
 	public void testReleased() {
-		ConveyorEntrySensorAgent entry = new ConveyorEntrySensorAgent("Entry");
+		Transducer trans = new Transducer();
+		Object args[] = new Object[1];
+		args[0] = 0;
+		ConveyorEntrySensorAgent entry = new ConveyorEntrySensorAgent("Entry", trans, 0);
 		MockConveyor conv = new MockConveyor();
 		MockConveyorFamily prevConv = new MockConveyorFamily();
 		entry.setConveyor(conv);
@@ -49,7 +64,7 @@ public class TestPreSensor {
 		assertTrue(entry.sensorState == SensorState.Nothing);
 		assertTrue(entry.parts.isEmpty());
 		entry.msgHereIsParts(p);
-		entry.msgPressed();
+		entry.eventFired(TChannel.SENSOR, TEvent.SENSOR_GUI_PRESSED, args);
 		assertFalse(entry.parts.isEmpty());
 		assertTrue(entry.sensorState == SensorState.Pressed);
 		assertTrue(entry.pickAndExecuteAnAction());
@@ -57,7 +72,7 @@ public class TestPreSensor {
 		assertTrue(entry.sensorState == SensorState.Pressed);
 		assertTrue(entry.events.containsString("Sensor Pressed"));
 		assertTrue(entry.events.containsString("Stop Conveyor"));
-		entry.msgReleased();
+		entry.eventFired(TChannel.SENSOR, TEvent.SENSOR_GUI_RELEASED, args);
 		assertTrue(entry.pickAndExecuteAnAction());
 		assertTrue(entry.events.containsString("Sensor Released"));
 		assertTrue(entry.events.containsString("Start Conveyor"));
@@ -66,7 +81,10 @@ public class TestPreSensor {
 	
 	@Test
 	public void testInforPrevConv() {
-		ConveyorEntrySensorAgent entry = new ConveyorEntrySensorAgent("Entry");
+		Transducer trans = new Transducer();
+		Object args[] = new Object[1];
+		args[0] = 0;
+		ConveyorEntrySensorAgent entry = new ConveyorEntrySensorAgent("Entry", trans, 0);
 		MockConveyor conv = new MockConveyor();
 		MockConveyorFamily prevConv = new MockConveyorFamily();
 		entry.setConveyor(conv);
@@ -75,12 +93,12 @@ public class TestPreSensor {
 		assertTrue(entry.parts.isEmpty());
 		Part p = new Part("x");
 		entry.msgHereIsParts(p);
-		entry.msgPressed();
+		entry.eventFired(TChannel.SENSOR, TEvent.SENSOR_GUI_PRESSED, args);
 		assertFalse(entry.parts.isEmpty());
 		assertTrue(entry.sensorState == SensorState.Pressed);
 		assertTrue(entry.pickAndExecuteAnAction());
 		assertTrue(prevConv.events.containsString("Conveyor Stopping"));
-		entry.msgReleased();
+		entry.eventFired(TChannel.SENSOR, TEvent.SENSOR_GUI_RELEASED, args);
 		assertTrue(entry.sensorState == SensorState.Released);
 		assertTrue(entry.pickAndExecuteAnAction());
 		assertTrue(prevConv.events.containsString("Conveyor Working"));

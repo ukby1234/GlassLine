@@ -15,6 +15,7 @@ public class ConveyorEntrySensorAgent extends Agent implements PreSensor{
 	public Conveyor conveyor;
 	public ConveyorFamily prevConv;
 	public int index;
+	public boolean flag = false;
 	//Messaging
 	
 	public void msgHereIsParts(Part p) {
@@ -43,8 +44,9 @@ public class ConveyorEntrySensorAgent extends Agent implements PreSensor{
 	@Override
 	public boolean pickAndExecuteAnAction() {
 		// TODO Auto-generated method stub
-		if(sensorState == SensorState.Pressed) {
+		if(sensorState == SensorState.Pressed && !flag) {
 			informPrevConveyor();
+			flag = true;
 			/*try {
 				Thread.sleep(500);
 			}catch(InterruptedException e) {}
@@ -56,6 +58,7 @@ public class ConveyorEntrySensorAgent extends Agent implements PreSensor{
 			informNextConveyor();
 			informPrevConveyor();
 			sensorState = SensorState.Nothing;
+			flag = false;
 			return true;
 		}
 			
@@ -78,13 +81,16 @@ public class ConveyorEntrySensorAgent extends Agent implements PreSensor{
 		conveyor.msgHereIsParts(parts.remove(0));
 	}
 	//Other Methods
-	public ConveyorEntrySensorAgent(String agentName) {
+	public ConveyorEntrySensorAgent(String agentName, int index) {
 		super(agentName);
+		this.index = index;
 		// TODO Auto-generated constructor stub
 	}
 
-	public ConveyorEntrySensorAgent(String agentName, Transducer ft) {
+	public ConveyorEntrySensorAgent(String agentName, Transducer ft, int index) {
 		super(agentName, ft);
+		transducer.register(this, TChannel.SENSOR);
+		this.index = index;
 		// TODO Auto-generated constructor stub
 	}
 	

@@ -14,6 +14,7 @@ public class ConveyorAgent extends Agent implements Conveyor {
 	public ConveyorState conveyorState = ConveyorState.Running;
 	public boolean changed = false;
 	PostSensor exitSensor;
+	int index;
 	//Messaging
 	@Override
 	public void msgHereIsParts(Part p) {
@@ -25,6 +26,7 @@ public class ConveyorAgent extends Agent implements Conveyor {
 	@Override
 	public void msgStopConveyor() {
 		// TODO Auto-generated method stub
+		print("St R");
 		conveyorState = ConveyorState.Stopped;
 		changed = true;
 		stateChanged();
@@ -33,6 +35,7 @@ public class ConveyorAgent extends Agent implements Conveyor {
 	@Override
 	public void msgStartConveyor() {
 		// TODO Auto-generated method stub
+		print("Sta R");
 		conveyorState = ConveyorState.Running;
 		changed = true;
 		stateChanged();
@@ -57,9 +60,15 @@ public class ConveyorAgent extends Agent implements Conveyor {
 	private void doConveyor() {
 		if (conveyorState == ConveyorState.Running) {
 			print("Start Conveyor");
+			Object args[] = new Object[1];
+			args[0] = index;
+			transducer.fireEvent(TChannel.CONVEYOR, TEvent.CONVEYOR_DO_START, args);
 			events.add(new LoggedEvent("Start Conveyor"));
 		}
 		else {
+			Object args[] = new Object[1];
+			args[0] = index;
+			transducer.fireEvent(TChannel.CONVEYOR, TEvent.CONVEYOR_DO_STOP, args);
 			print("Stop Conveyor");
 			events.add(new LoggedEvent("Stop Conveyor"));
 		}
@@ -75,13 +84,16 @@ public class ConveyorAgent extends Agent implements Conveyor {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ConveyorAgent(String agentName) {
+	public ConveyorAgent(String agentName, int index) {
 		super(agentName);
 		// TODO Auto-generated constructor stub
+		this.index = index;
 	}
 
-	public ConveyorAgent(String agentName, Transducer ft) {
+	public ConveyorAgent(String agentName, Transducer ft, int index) {
 		super(agentName, ft);
+		transducer.register(this, TChannel.CONVEYOR);
+		this.index = index;
 		// TODO Auto-generated constructor stub
 	}
 	

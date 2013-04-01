@@ -23,7 +23,8 @@ public class PopupAgent extends Agent implements Popup{
 	String type = "x";
 	PostSensor s;
 	Semaphore sem = new Semaphore(0, true);
-	boolean isStopped = false;
+	public boolean isStopped = false;
+	public boolean flag = true;
 	public class MyParts {
 		public Part part;
 		public PartState partState;
@@ -120,6 +121,13 @@ public class PopupAgent extends Agent implements Popup{
 			startConveyor();
 			return true;
 		}
+		
+		if (flag && popupState == PopupState.Down) {
+			print("10");
+			stopWorkstations();
+			flag = false;
+			return true;
+		}
 
 		if (currentPart != null && currentPart.partState == PartState.PartsComing) {
 			print("2");
@@ -140,7 +148,7 @@ public class PopupAgent extends Agent implements Popup{
 				}
 			}
 		}
-		print("" + (ws == null));
+		//print("" + (ws == null));
 		if (ws != null && popupState == PopupState.Up) {
 			print("3");
 			informRobot(ws);
@@ -156,11 +164,11 @@ public class PopupAgent extends Agent implements Popup{
 
 		if (currentPart != null && currentPart.partState == PartState.NeedMoving) {
 			print("5");
-			if (getWorkstation() == null) {
+			/*if (getWorkstation() == null) {
 				if (!isStopped)
 					stopConveyor();
 				return true;
-			}
+			}*/
 			movePopup(popupState == PopupState.Down ? 1 : 0);
 			if (!currentPart.isProcessed)
 				currentPart.partState = PartState.NeedProcessing;
@@ -174,7 +182,8 @@ public class PopupAgent extends Agent implements Popup{
 			processPart(currentPart);
 			currentPart = null;
 			movePopup(0);
-			startConveyor();
+			if (getWorkstation() != null)
+				startConveyor();
 			return true;
 		}
 
@@ -196,7 +205,7 @@ public class PopupAgent extends Agent implements Popup{
 
 	//Actions
 	private void loadPopup() {
-		stopConveyor();
+		stopConveyor();	
 		print("Loading popup");
 		events.add(new LoggedEvent("Loading popup"));
 		//msgLoadingFinished();
@@ -216,8 +225,11 @@ public class PopupAgent extends Agent implements Popup{
 	}
 
 	private void movePopup(int direction) {
+		Object args[] = new Object[1];
+		args[0] = index;
 		if (direction == 0) {
 			Do("Move Down");
+			transducer.fireEvent(TChannel.POPUP, TEvent.POPUP_DO_MOVE_DOWN, args);
 			events.add(new LoggedEvent("Move Down"));
 			//msgMoveFinished();
 			popupState = PopupState.Down;
@@ -226,6 +238,7 @@ public class PopupAgent extends Agent implements Popup{
 		else {
 			//s.msgPopupRaise();
 			Do("Move Up");
+			transducer.fireEvent(TChannel.POPUP, TEvent.POPUP_DO_MOVE_UP, args);
 			events.add(new LoggedEvent("Move Up"));
 			//msgMoveFinished();
 			popupState = PopupState.Up;	
@@ -237,6 +250,9 @@ public class PopupAgent extends Agent implements Popup{
 
 	private void releasePopup(){
 		print("Released");
+		Object args[] = new Object[1];
+		args[0] = index;
+		transducer.fireEvent(TChannel.POPUP, TEvent.POPUP_RELEASE_GLASS, args);
 		events.add(new LoggedEvent("Released"));
 		while(!sem.tryAcquire());
 		nextConv.msgHereIsParts(currentPart.part);
@@ -248,6 +264,9 @@ public class PopupAgent extends Agent implements Popup{
 	private void processPart(MyParts p) {
 		print(p.part.type + " is processing");
 		events.add(new LoggedEvent(p.part.type + " is processing"));
+		Object args[] = new Object[1];
+		args[0] = 2;
+		//transducer.fireEvent(TChannel.DRILL, TEvent.WORKSTATION_DO_LOAD_GLASS, args);
 		MyWorkstation temp = getWorkstation();
 		temp.workStation.msgSendGlass(p.part);
 		temp.state = WorkstationState.Stopped;
@@ -257,8 +276,15 @@ public class PopupAgent extends Agent implements Popup{
 	private void informRobot(MyWorkstation ws) {
 		print("I'm ready");
 		events.add(new LoggedEvent("I'm ready"));
-		ws.workStation.msgIsPopupAvailable();
+		ws.workStation.msgIsPopupAvailable(true);
 		ws.needMove = false;
+		flag = true;
+	}
+	
+	private void stopWorkstations() {
+		for (MyWorkstation ws : workstations) {
+			ws.workStation.msgIsPopupAvailable(false);
+		}
 	}
 	
 	private MyWorkstation getWorkstation() {
@@ -271,13 +297,16 @@ public class PopupAgent extends Agent implements Popup{
 		return null;
 	}
 
-	public PopupAgent(String agentName) {
+	public PopupAgent(String agentName, int index) {
 		super(agentName);
+		this.index = index;
 		// TODO Auto-generated constructor stub
 	}
 
-	public PopupAgent(String agentName, Transducer ft) {
+	public PopupAgent(String agentName, Transducer ft, int index) {
 		super(agentName, ft);
+		transducer.register(this, TChannel.POPUP);
+		this.index = index;
 		// TODO Auto-generated constructor stub
 	}
 

@@ -1,19 +1,20 @@
 package engine.factory;
 
+import transducer.*;
 import engine.factory.interfaces.*;
 import engine.factory.shared.Part;
 import engine.factory.conveyorFamily.*;
 
 public class ConveyorFamilyAgent implements ConveyorFamily {
-	Conveyor conv;
-	PostSensor postSensor;
-	PreSensor preSensor;
-	Popup popup;
-	public ConveyorFamilyAgent() {
-		conv = new ConveyorAgent("Conveyor");
-		postSensor = new ConveyorExitSensorAgent("Exit");
-		preSensor = new ConveyorEntrySensorAgent("Entry");
-		popup = new PopupAgent("Popup");
+	ConveyorAgent conv;
+	ConveyorExitSensorAgent postSensor;
+	ConveyorEntrySensorAgent preSensor;
+	PopupAgent popup;
+	public ConveyorFamilyAgent(int index, Transducer trans) {
+		conv = new ConveyorAgent("Conveyor", trans, index);
+		postSensor = new ConveyorExitSensorAgent("Exit", trans, index + 1);
+		preSensor = new ConveyorEntrySensorAgent("Entry", trans, index);
+		popup = new PopupAgent("Popup", trans, index);
 		conv.setPostSensor(postSensor);
 		postSensor.setConveyor(conv);
 		postSensor.setPopupAgent(popup);
@@ -38,7 +39,17 @@ public class ConveyorFamilyAgent implements ConveyorFamily {
 	}
 	
 	public void startThread() {
-		
+		conv.startThread();
+		preSensor.startThread();
+		postSensor.startThread();
+		popup.startThread();
+	}
+	
+	public void stopThread() {
+		conv.stopAgent();
+		preSensor.stopAgent();
+		postSensor.stopAgent();
+		popup.stopAgent();
 	}
 	
 	public void setPrevConv(ConveyorFamily conv) {

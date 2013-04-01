@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
+import engine.factory.testing.util.*;
+
 /**
  * This class is the fundamental support for front/back end communication.
  * Any class implementing the TReceiver interface can use the Transducer to
@@ -54,6 +56,8 @@ public class Transducer
 	/**
 	 * Internal class to package register events
 	 */
+	
+	public EventLog events = new EventLog();
 	private class RegistrationEvent
 	{
 		TReceiver receiver;
@@ -235,6 +239,7 @@ public class Transducer
 	{
 		if (debugActions)
 			System.out.println("Transducer: " + "Queueing registration of " + toRegister + " on channel " + channel);
+		events.add(new LoggedEvent("Transducer: " + "Queueing registration of " + toRegister + " on channel " + channel));
 		RegistrationEvent next = new RegistrationEvent(toRegister, channel);
 		toBeRegistered.add(next);
 		this.stateChanged();
@@ -371,6 +376,7 @@ public class Transducer
 	{
 		if (debugActions)
 			System.out.println("Transducer: " + "Adding event " + event + " on channel " + channel + " to queue.");
+		events.add(new LoggedEvent("Transducer: " + "Adding event " + event + " on channel " + channel + " to queue."));
 		TransducerEvent next = new TransducerEvent(channel, event, args);
 		toBeFired.add(next);
 		this.stateChanged();

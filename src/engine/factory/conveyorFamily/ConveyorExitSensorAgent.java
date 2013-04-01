@@ -132,13 +132,16 @@ public class ConveyorExitSensorAgent extends Agent implements PostSensor{
 		}
 	}
 
-	public ConveyorExitSensorAgent(String agentName) {
+	public ConveyorExitSensorAgent(String agentName, int index) {
 		super(agentName);
+		this.index = index;
 		// TODO Auto-generated constructor stub
 	}
 
-	public ConveyorExitSensorAgent(String agentName, Transducer ft) {
+	public ConveyorExitSensorAgent(String agentName, Transducer ft, int index) {
 		super(agentName, ft);
+		transducer.register(this, TChannel.SENSOR);
+		this.index = index;
 		// TODO Auto-generated constructor stub
 	}
 

@@ -4,10 +4,10 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import transducer.*;
+
 import engine.factory.conveyorFamily.*;
-import engine.factory.conveyorFamily.ConveyorExitSensorAgent.ConveyorState;
-import engine.factory.conveyorFamily.ConveyorExitSensorAgent.PopupState;
-import engine.factory.conveyorFamily.ConveyorExitSensorAgent.SensorState;
+import engine.factory.conveyorFamily.ConveyorExitSensorAgent.*;
 import engine.factory.shared.Part;
 import engine.factory.testing.mockAgent.*;
 
@@ -16,7 +16,10 @@ public class TestPostSensor {
 	@Test
 	public void testReceivePart() {
 		//fail("Not yet implemented");
-		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit");
+		Transducer trans = new Transducer();
+		Object args[] = new Object[1];
+		args[0] = 1;
+		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit", trans, 1);
 		Part p = new Part("x");
 		assertTrue(exit.parts.isEmpty());
 		exit.msgHereIsParts(p);
@@ -25,22 +28,28 @@ public class TestPostSensor {
 
 	@Test
 	public void testPressed() {
-		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit");
+		Transducer trans = new Transducer();
+		Object args[] = new Object[1];
+		args[0] = 1;
+		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit", trans, 1);
 		assertTrue(exit.sensorState == SensorState.Nothing);
-		exit.msgPressed();
+		exit.eventFired(TChannel.SENSOR, TEvent.SENSOR_GUI_PRESSED, args);
 		assertTrue(exit.sensorState == SensorState.Pressed);
 		assertTrue(exit.events.containsString("Pressed"));
 	}
 	
 	@Test
 	public void testStopConv() {
-		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit");
+		Transducer trans = new Transducer();
+		Object args[] = new Object[1];
+		args[0] = 1;
+		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit", trans, 1);
 		MockConveyor conv = new MockConveyor();
 		exit.setConveyor(conv);
 		assertTrue(exit.sensorState == SensorState.Nothing);
 		assertTrue(exit.popupState == PopupState.Down);
 		assertTrue(exit.conveyorState == ConveyorState.Running);
-		exit.msgPressed();
+		exit.eventFired(TChannel.SENSOR, TEvent.SENSOR_GUI_PRESSED, args);
 		exit.msgPopupRaise();
 		assertTrue(exit.sensorState == SensorState.Pressed);
 		assertTrue(exit.popupState == PopupState.Up);
@@ -52,7 +61,10 @@ public class TestPostSensor {
 	
 	@Test
 	public void testStartConv() {
-		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit");
+		Transducer trans = new Transducer();
+		Object args[] = new Object[1];
+		args[0] = 1;
+		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit", trans, 1);
 		MockConveyor conv = new MockConveyor();
 		exit.setConveyor(conv);
 		exit.conveyorState = ConveyorState.Stopped;
@@ -65,7 +77,10 @@ public class TestPostSensor {
 	
 	@Test
 	public void testPassToPopup() {
-		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit");
+		Transducer trans = new Transducer();
+		Object args[] = new Object[1];
+		args[0] = 1;
+		ConveyorExitSensorAgent exit = new ConveyorExitSensorAgent("Exit", trans, 1);
 		MockPopup popup = new MockPopup();
 		exit.setPopupAgent(popup);
 		Part p = new Part("x");
@@ -74,13 +89,13 @@ public class TestPostSensor {
 		assertTrue(exit.conveyorState == ConveyorState.Running);
 		assertTrue(exit.parts.isEmpty());
 		exit.msgHereIsParts(p);
-		exit.msgPressed();
+		exit.eventFired(TChannel.SENSOR, TEvent.SENSOR_GUI_PRESSED, args);
 		assertTrue(exit.sensorState == SensorState.Pressed);
 		assertTrue(exit.popupState == PopupState.Down);
 		assertTrue(exit.conveyorState == ConveyorState.Running);
 		assertFalse(exit.parts.isEmpty());
 		assertTrue(exit.events.containsString("Pressed"));
-		exit.msgReleased();
+		exit.eventFired(TChannel.SENSOR, TEvent.SENSOR_GUI_RELEASED, args);
 		assertTrue(exit.sensorState == SensorState.Released);
 		assertTrue(exit.events.containsString("Released"));
 		exit.pickAndExecuteAnAction();

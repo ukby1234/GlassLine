@@ -2,6 +2,8 @@ package engine.factory.testing;
 
 import static org.junit.Assert.*;
 import org.junit.Test;
+
+import transducer.*;
 import engine.factory.conveyorFamily.*;
 import engine.factory.conveyorFamily.ConveyorAgent.ConveyorState;
 import engine.factory.interfaces.*;
@@ -12,7 +14,8 @@ public class TestConveyor {
 
 	@Test
 	public void testStartConv() {
-		ConveyorAgent conv = new ConveyorAgent("Conv");
+		Transducer trans = new Transducer();
+		ConveyorAgent conv = new ConveyorAgent("Conv", trans, 0);
 		conv.conveyorState = ConveyorState.Stopped;
 		assertTrue(conv.conveyorState == ConveyorState.Stopped);
 		conv.msgStartConveyor();
@@ -21,11 +24,13 @@ public class TestConveyor {
 		conv.pickAndExecuteAnAction();
 		assertFalse(conv.changed);
 		assertTrue(conv.events.containsString("Start Conveyor"));
+		assertTrue(trans.events.containsString("Transducer: " + "Adding event " + TEvent.CONVEYOR_DO_START + " on channel " + TChannel.CONVEYOR + " to queue."));
 	}
 	
 	@Test
 	public void testStopConv() {
-		ConveyorAgent conv = new ConveyorAgent("Conv");
+		Transducer trans = new Transducer();
+		ConveyorAgent conv = new ConveyorAgent("Conv", trans, 0);
 		assertTrue(conv.conveyorState == ConveyorState.Running);
 		conv.msgStopConveyor();
 		assertTrue(conv.conveyorState == ConveyorState.Stopped);
@@ -33,11 +38,12 @@ public class TestConveyor {
 		conv.pickAndExecuteAnAction();
 		assertFalse(conv.changed);
 		assertTrue(conv.events.containsString("Stop Conveyor"));
+		assertTrue(trans.events.containsString("Transducer: " + "Adding event " + TEvent.CONVEYOR_DO_STOP + " on channel " + TChannel.CONVEYOR + " to queue."));
 	}
 	
 	@Test
 	public void testSendPart() {
-		ConveyorAgent conv = new ConveyorAgent("Conv");
+		ConveyorAgent conv = new ConveyorAgent("Conv", 0);
 		MockPostSensor post = new MockPostSensor();
 		conv.setPostSensor(post);
 		Part p = new Part("x");
