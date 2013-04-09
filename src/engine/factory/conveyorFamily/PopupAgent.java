@@ -2,6 +2,7 @@ package engine.factory.conveyorFamily;
 
 import transducer.*;
 import engine.agent.Agent;
+import engine.factory.WorkstationAgent.OperatorStatus;
 import engine.factory.interfaces.*;
 import engine.factory.shared.Part;
 import engine.factory.testing.util.*;
@@ -110,6 +111,11 @@ public class PopupAgent extends Agent implements Popup{
 		sem.release();
 		stateChanged();
 	}
+	
+	public void msgLoadedGlass() {
+		sem.release();
+		stateChanged();
+	}
 	//Scheduler
 	@Override
 	public boolean pickAndExecuteAnAction() {
@@ -181,6 +187,7 @@ public class PopupAgent extends Agent implements Popup{
 			print("6");
 			processPart(currentPart);
 			currentPart = null;
+			while(!sem.tryAcquire());
 			movePopup(0);
 			if (getWorkstation() != null)
 				startConveyor();
@@ -265,7 +272,7 @@ public class PopupAgent extends Agent implements Popup{
 		print(p.part.type + " is processing");
 		events.add(new LoggedEvent(p.part.type + " is processing"));
 		Object args[] = new Object[1];
-		args[0] = 2;
+		args[0] = 1;
 		//transducer.fireEvent(TChannel.DRILL, TEvent.WORKSTATION_DO_LOAD_GLASS, args);
 		MyWorkstation temp = getWorkstation();
 		temp.workStation.msgSendGlass(p.part);

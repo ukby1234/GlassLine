@@ -13,5 +13,6 @@ public interface Popup {
 	public void setPostSensor(PostSensor s);
 	public void setNextConvFamily(ConveyorFamily conv);
 	public void addWorkStation(Workstation ws);
+	public void msgLoadedGlass();
 	public String getName();
 }

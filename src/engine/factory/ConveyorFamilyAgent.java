@@ -10,16 +10,10 @@ public class ConveyorFamilyAgent implements ConveyorFamily {
 	ConveyorExitSensorAgent postSensor;
 	ConveyorEntrySensorAgent preSensor;
 	PopupAgent popup;
-	public ConveyorFamilyAgent(int index, Transducer trans) {
-		conv = new ConveyorAgent("Conveyor", trans, index);
-		postSensor = new ConveyorExitSensorAgent("Exit", trans, index + 1);
-		preSensor = new ConveyorEntrySensorAgent("Entry", trans, index);
-		popup = new PopupAgent("Popup", trans, index);
-		conv.setPostSensor(postSensor);
-		postSensor.setConveyor(conv);
-		postSensor.setPopupAgent(popup);
-		preSensor.setConveyor(conv);
-		popup.setPostSensor(postSensor);
+	Transducer t;
+	WorkstationAgent ws1, ws2;
+	public ConveyorFamilyAgent(Transducer trans) {
+		t = trans;
 	}
 	@Override
 	public void msgisAvailable(boolean state) {
@@ -58,6 +52,42 @@ public class ConveyorFamilyAgent implements ConveyorFamily {
 	
 	public void setNextConv(ConveyorFamily conv) {
 		popup.setNextConvFamily(conv);
+	}
+	
+	public void setPopupIndex(int index) {
+		popup = new PopupAgent("Popup", t, index);
+	}
+	
+	public void setConvIndex(int index) {
+		conv = new ConveyorAgent("Conveyor", t, index);
+		conv.setPostSensor(postSensor);
+	}
+	
+	public void setPostIndex(int index) {
+		postSensor = new ConveyorExitSensorAgent("Exit", t, index);
+	}
+	
+	public void setPreIndex(int index) {
+		preSensor = new ConveyorEntrySensorAgent("Entry", t, index);
+	}
+	
+	public void setUp() {
+		conv.setPostSensor(postSensor);
+		postSensor.setConveyor(conv);
+		postSensor.setPopupAgent(popup);
+		preSensor.setConveyor(conv);
+		popup.setPostSensor(postSensor);
+		popup.addWorkStation(ws1);
+		popup.addWorkStation(ws2);
+	}
+	
+	public void setWorkstation(WorkstationAgent ws1, WorkstationAgent ws2) {
+		this.ws1 = ws1;
+		this.ws2 = ws2;
+	}
+	
+	public Popup getPopup() {
+		return popup;
 	}
 
 }

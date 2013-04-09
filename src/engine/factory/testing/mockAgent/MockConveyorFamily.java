@@ -1,6 +1,7 @@
 package engine.factory.testing.mockAgent;
 
 import engine.factory.interfaces.ConveyorFamily;
+import engine.factory.interfaces.Popup;
 import engine.factory.shared.Part;
 import engine.factory.testing.util.*;
 
@@ -21,6 +22,12 @@ public class MockConveyorFamily implements ConveyorFamily {
 	public void msgHereIsParts(Part p) {
 		// TODO Auto-generated method stub
 		events.add(new LoggedEvent("Receive parts " + p.type));
+	}
+
+	@Override
+	public Popup getPopup() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

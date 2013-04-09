@@ -305,7 +305,7 @@ public class StatePanel extends JPanel
 			try
 			{
 				parent.getGuiParent().getGuiParent().setTimerDelay(1000 / newSpeed);
-				// System.out.println("Timer delay set to " + (1000 / newSpeed));
+				System.out.println("Timer delay set to " + (1000 / newSpeed));
 			}
 			catch (NullPointerException npe)
 			{

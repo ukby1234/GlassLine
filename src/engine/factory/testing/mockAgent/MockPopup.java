@@ -72,4 +72,10 @@ public class MockPopup implements Popup {
 		
 	}
 
+	@Override
+	public void msgLoadedGlass() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
