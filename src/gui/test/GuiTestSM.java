@@ -15,6 +15,7 @@ public class GuiTestSM implements TReceiver
 	Transducer t;
 
 	boolean offlineDone = false;
+	ConveyorFamilyAgent conv;
 
 	public GuiTestSM(Transducer t)
 	{
@@ -38,12 +39,14 @@ public class GuiTestSM implements TReceiver
 			newArgs[0] = i;
 				t.fireEvent(TChannel.CONVEYOR, TEvent.CONVEYOR_DO_START, newArgs);
 		}
-		ConveyorFamilyAgent conv = new ConveyorFamilyAgent(t);
+		
+		conv = new ConveyorFamilyAgent(t);
 		MockConveyorFamily prev = new MockConveyorFamily();
 		ConveyorFamilyAgent next = new ConveyorFamilyAgent(t);
 		MockConveyorFamily temp = new MockConveyorFamily();
 		WorkstationAgent ws1 = new WorkstationAgent(conv, 0, TChannel.DRILL);
 		WorkstationAgent ws2 = new WorkstationAgent(conv, 1, TChannel.DRILL);
+		
 		ws1.setTransducer(t);
 		ws2.setTransducer(t);
 		ws1.startThread();
@@ -71,10 +74,9 @@ public class GuiTestSM implements TReceiver
 		next.setPrevConv(conv);
 		next.setNextConv(temp);
 		next.setUp();
-		Part p = new Part("x");
 		conv.startThread();
 		next.startThread();
-		conv.msgHereIsParts(p);
+		
 	}
 
 	@Override
@@ -91,6 +93,7 @@ public class GuiTestSM implements TReceiver
 		}*/
 		if(channel == TChannel.CUTTER && event == TEvent.WORKSTATION_LOAD_FINISHED){//added by monroe
 			t.fireEvent(TChannel.CUTTER, TEvent.WORKSTATION_DO_ACTION, null);
+			t.fireEvent(TChannel.BIN, TEvent.BIN_CREATE_PART, null);
 		}
 		else if (channel == TChannel.CUTTER && event == TEvent.WORKSTATION_GUI_ACTION_FINISHED)
 		{
@@ -109,6 +112,8 @@ public class GuiTestSM implements TReceiver
 		else if (channel == TChannel.MANUAL_BREAKOUT && event == TEvent.WORKSTATION_GUI_ACTION_FINISHED)
 		{
 			t.fireEvent(TChannel.MANUAL_BREAKOUT, TEvent.WORKSTATION_RELEASE_GLASS, null);
+			Part p = new Part("x");
+			conv.msgHereIsParts(p);
 		}
 		/*else if (channel == TChannel.POPUP && event == TEvent.POPUP_GUI_LOAD_FINISHED)
 		{

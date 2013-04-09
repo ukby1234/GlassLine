@@ -14,5 +14,6 @@ public interface Popup {
 	public void setNextConvFamily(ConveyorFamily conv);
 	public void addWorkStation(Workstation ws);
 	public void msgLoadedGlass();
+	public void msgIsAvailable(Workstation w, boolean s);
 	public String getName();
 }

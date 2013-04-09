@@ -127,6 +127,7 @@ public class WorkstationAgent extends Agent implements Workstation {
 				t.fireEvent(channelName, TEvent.WORKSTATION_RELEASE_GLASS, new Object[] { operatorIndex });
 			}
 			popupAvailable = false;
+			family.getPopup().msgIsAvailable(this, true);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

@@ -78,4 +78,10 @@ public class MockPopup implements Popup {
 		
 	}
 
+	@Override
+	public void msgIsAvailable(Workstation w, boolean s) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

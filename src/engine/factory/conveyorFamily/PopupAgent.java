@@ -96,7 +96,8 @@ public class PopupAgent extends Agent implements Popup{
 	public void msgIsAvailable(Workstation w, boolean s) {
 		synchronized (workstations) {
 			for (MyWorkstation ws : workstations) {
-				if (ws == w) {
+				if (ws.workStation == w) {
+					print("Received");
 					if (s)
 						ws.state = WorkstationState.Working;
 					else
